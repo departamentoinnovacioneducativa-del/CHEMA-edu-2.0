@@ -1,0 +1,901 @@
+/* =============================================================
+   EDU CHEMA 2.o — Stylesheet Principal
+   Estética gamificada retro (16/32 bits)
+   ============================================================= */
+
+/* -------------------------------------------------------------
+   0. RESET COMPLEMENTARIO Y BASE
+   ------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+}
+
+body {
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+    /* Patrón sutil de rejilla pixelada sobre el azul marino */
+    background-image:
+        linear-gradient(rgba(26, 50, 112, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 50, 112, 0.25) 1px, transparent 1px);
+    background-size: 32px 32px;
+    /* Espacio inferior para la mascota */
+    padding-bottom: 140px;
+}
+
+::selection {
+    background-color: var(--color-green);
+    color: var(--color-yellow);
+}
+
+/* Eliminar outline por defecto, se usará estilo propio */
+:focus-visible {
+    outline: none;
+}
+
+/* -------------------------------------------------------------
+   1. CANVAS OVERLAY — Efectos visuales
+   ------------------------------------------------------------- */
+#fx-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: var(--z-fx-canvas);
+    pointer-events: none;
+    /* Sin fondo para que sea transparente */
+    background: transparent;
+}
+
+/* -------------------------------------------------------------
+   2. HEADER — Barra de navegación superior
+   ------------------------------------------------------------- */
+#main-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-xl);
+    background-color: var(--color-bg-dark);
+    border-bottom: var(--border-width) solid var(--color-green-dark);
+    box-shadow:
+        0 4px 0 0 var(--color-bg),
+        0 6px 0 0 var(--color-green-dark);
+}
+
+/* --- Brand / Logo --- */
+.header-brand {
+    flex-shrink: 0;
+}
+
+.brand-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-sm);
+    color: var(--color-yellow);
+    text-shadow:
+        2px 2px 0 var(--color-yellow-dark),
+        -1px -1px 0 var(--color-green-dark);
+    white-space: nowrap;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.brand-icon {
+    font-size: var(--fs-xl);
+    filter: drop-shadow(2px 2px 0 var(--color-green-dark));
+    animation: brand-bounce 2s ease-in-out infinite;
+}
+
+@keyframes brand-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+}
+
+.brand-version {
+    color: var(--color-green-light);
+    text-shadow:
+        1px 1px 0 var(--color-green-dark),
+        -1px -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* --- Navegación --- */
+#main-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+/* --- Dropdown contenedor --- */
+.nav-dropdown {
+    position: relative;
+}
+
+/* --- Trigger del dropdown --- */
+.nav-dropdown__trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    color: var(--color-text);
+    background-color: var(--color-bg-light);
+    border: var(--border-width) solid var(--color-green-dark);
+    border-bottom-color: var(--color-green);
+    border-right-color: var(--color-green);
+    box-shadow: var(--shadow-raised-sm);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    white-space: nowrap;
+}
+
+.nav-dropdown__trigger:hover {
+    background-color: var(--color-green-dark);
+    color: var(--color-yellow-light);
+}
+
+/* Estado "presionado" simulado */
+.nav-dropdown__trigger:active,
+.nav-dropdown__trigger[aria-expanded="true"] {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+    border-bottom-color: var(--color-green-dark);
+    border-right-color: var(--color-green-dark);
+    background-color: var(--color-green);
+    color: var(--color-bg-dark);
+}
+
+.nav-dropdown__icon {
+    font-size: var(--fs-xl);
+    line-height: 1;
+}
+
+.nav-dropdown__label {
+    font-size: var(--fs-md);
+}
+
+.nav-dropdown__arrow {
+    font-size: var(--fs-xs);
+    transition: transform var(--transition-mid);
+    color: var(--color-green-light);
+}
+
+.nav-dropdown__trigger[aria-expanded="true"] .nav-dropdown__arrow {
+    transform: rotate(180deg);
+    color: var(--color-bg-dark);
+}
+
+/* --- Menú desplegable --- */
+.nav-dropdown__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 220px;
+    list-style: none;
+    background-color: var(--color-bg-dark);
+    border: var(--border-width) solid var(--color-green-dark);
+    border-top: none;
+    box-shadow:
+        4px 4px 0 0 var(--color-green-dark),
+        0 8px 20px rgba(0, 0, 0, 0.5);
+    /* Oculto por defecto */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition:
+        opacity var(--transition-mid),
+        transform var(--transition-mid),
+        visibility var(--transition-mid);
+    z-index: var(--z-dropdown);
+}
+
+/* Estado visible */
+.nav-dropdown[data-open] .nav-dropdown__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Línea decorativa superior del menú */
+.nav-dropdown__menu::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-green), var(--color-yellow), var(--color-green));
+}
+
+/* --- Items del menú --- */
+.nav-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    color: var(--color-text);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    text-align: left;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        padding-left var(--transition-fast);
+}
+
+.nav-dropdown__item:last-child {
+    border-bottom: none;
+}
+
+.nav-dropdown__item:hover {
+    background-color: var(--color-green-dark);
+    color: var(--color-yellow-light);
+    padding-left: calc(var(--space-md) + 8px);
+}
+
+.nav-dropdown__item:active {
+    background-color: var(--color-green);
+    color: var(--color-bg-dark);
+}
+
+.nav-dropdown__item .item-icon {
+    font-size: var(--fs-xl);
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* --- Acciones del header --- */
+.header-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.btn-icon {
+    font-size: var(--fs-xl);
+    background: var(--color-bg-light);
+    border: 2px solid var(--color-green-dark);
+    border-bottom-color: var(--color-green);
+    border-right-color: var(--color-green);
+    box-shadow: 2px 2px 0 var(--color-green-dark);
+    padding: var(--space-xs) var(--space-sm);
+    cursor: pointer;
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    line-height: 1;
+}
+
+.btn-icon:hover {
+    background-color: var(--color-green-dark);
+}
+
+.btn-icon:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+/* -------------------------------------------------------------
+   3. MAIN — Contenido principal
+   ------------------------------------------------------------- */
+#main-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+}
+
+.dashboard-section {
+    width: 100%;
+}
+
+/* -------------------------------------------------------------
+   4. HERO SECTION
+   ------------------------------------------------------------- */
+#hero-section {
+    text-align: center;
+    padding: var(--space-2xl) var(--space-md);
+    border: var(--border-width) solid var(--color-green-dark);
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-bg-dark) 0%,
+            var(--color-bg-light) 50%,
+            var(--color-bg-dark) 100%
+        );
+    box-shadow:
+        var(--shadow-raised),
+        inset 0 0 60px rgba(0, 170, 68, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de scanlines retro sobre el hero */
+#hero-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+    );
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-2xl);
+    color: var(--color-yellow);
+    text-shadow:
+        3px 3px 0 var(--color-yellow-dark),
+        -1px -1px 0 var(--color-green-dark);
+    margin-bottom: var(--space-lg);
+    line-height: 1.6;
+    animation: hero-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes hero-glow {
+    0%   { text-shadow: 3px 3px 0 var(--color-yellow-dark), -1px -1px 0 var(--color-green-dark); }
+    100% { text-shadow: 3px 3px 0 var(--color-yellow-dark), -1px -1px 0 var(--color-green-dark), 0 0 20px rgba(255, 200, 0, 0.3); }
+}
+
+.hero-subtitle {
+    font-size: var(--fs-xl);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+/* -------------------------------------------------------------
+   5. SECTION TITLES
+   ------------------------------------------------------------- */
+.section-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-md);
+    color: var(--color-green-light);
+    text-shadow: 2px 2px 0 var(--color-green-dark);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px dashed var(--color-border);
+    letter-spacing: 1px;
+}
+
+/* -------------------------------------------------------------
+   6. CARDS GRID — Tarjetas de acceso rápido
+   ------------------------------------------------------------- */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* --- Tarjeta individual --- */
+.tool-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    background-color: var(--color-bg-light);
+    border: var(--border-width) solid var(--color-green-dark);
+    border-bottom-color: var(--color-green);
+    border-right-color: var(--color-green);
+    box-shadow: var(--shadow-raised);
+    cursor: pointer;
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
+    outline: none;
+}
+
+.tool-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow:
+        6px 6px 0 0 var(--color-green-dark),
+        0 0 15px rgba(0, 170, 68, 0.15);
+    background-color: var(--color-bg);
+    border-color: var(--color-green-light);
+}
+
+/* Estado focus-visible para accesibilidad teclado */
+.tool-card:focus-visible {
+    border-color: var(--color-yellow);
+    box-shadow:
+        6px 6px 0 0 var(--color-yellow-dark),
+        0 0 0 2px var(--color-yellow);
+}
+
+/* Estado "presionado" */
+.tool-card:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+    border-bottom-color: var(--color-green-dark);
+    border-right-color: var(--color-green-dark);
+    background-color: var(--color-green-dark);
+}
+
+.tool-card__icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.4));
+    transition: transform var(--transition-mid);
+}
+
+.tool-card:hover .tool-card__icon {
+    transform: scale(1.15) rotate(-3deg);
+}
+
+.tool-card__title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xs);
+    color: var(--color-yellow);
+    text-shadow: 1px 1px 0 var(--color-yellow-dark);
+    line-height: 1.6;
+}
+
+.tool-card__desc {
+    font-size: var(--fs-md);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+    flex: 1;
+}
+
+/* --- Tags de categoría --- */
+.tool-card__tag {
+    align-self: flex-start;
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xs);
+    padding: 2px 8px;
+    border: 2px solid;
+    letter-spacing: 0.5px;
+}
+
+.tag-time {
+    color: var(--color-green-light);
+    border-color: var(--color-green-dark);
+    background-color: rgba(0, 170, 68, 0.1);
+}
+
+.tag-random {
+    color: var(--color-yellow-light);
+    border-color: var(--color-yellow-dark);
+    background-color: rgba(255, 200, 0, 0.1);
+}
+
+.tag-eval {
+    color: #ff8866;
+    border-color: #aa4422;
+    background-color: rgba(255, 136, 102, 0.1);
+}
+
+/* -------------------------------------------------------------
+   7. TOOL PANEL — Contenedor dinámico de herramientas
+   ------------------------------------------------------------- */
+#tool-panel {
+    min-height: 100px;
+    border: var(--border-width) dashed var(--color-border);
+    padding: var(--space-xl);
+    background-color: rgba(17, 35, 85, 0.4);
+    display: none; /* Se muestra cuando se carga una herramienta */
+}
+
+#tool-panel.is-active {
+    display: block;
+    border-style: solid;
+    border-color: var(--color-green-dark);
+    animation: panel-appear 0.3s ease-out;
+}
+
+@keyframes panel-appear {
+    0%   { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Botón para cerrar el panel de herramienta */
+.tool-panel__close {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    background: var(--color-bg-dark);
+    border: 2px solid var(--color-border);
+    padding: var(--space-xs) var(--space-sm);
+    cursor: pointer;
+    transition:
+        color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.tool-panel__close:hover {
+    color: var(--color-yellow);
+    border-color: var(--color-yellow-dark);
+}
+
+/* -------------------------------------------------------------
+   8. BOTONES RETRO — Estilo genérico para botones gamificados
+   ------------------------------------------------------------- */
+.btn-retro {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xs);
+    padding: var(--space-md) var(--space-lg);
+    border: var(--border-width) solid;
+    cursor: pointer;
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+    white-space: nowrap;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+}
+
+.btn-retro__icon {
+    font-size: var(--fs-lg);
+    line-height: 1;
+}
+
+/* --- Variante Verde --- */
+.btn-retro.btn-green {
+    color: var(--color-bg-dark);
+    background-color: var(--color-green);
+    border-color: var(--color-green-dark);
+    border-bottom-color: var(--color-green-light);
+    border-right-color: var(--color-green-light);
+    box-shadow: var(--shadow-raised);
+}
+
+.btn-retro.btn-green:hover {
+    background-color: var(--color-green-light);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-green-dark);
+}
+
+.btn-retro.btn-green:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+    border-bottom-color: var(--color-green-dark);
+    border-right-color: var(--color-green-dark);
+    background-color: var(--color-green-dark);
+    color: var(--color-text);
+}
+
+/* --- Variante Amarilla --- */
+.btn-retro.btn-yellow {
+    color: var(--color-bg-dark);
+    background-color: var(--color-yellow);
+    border-color: var(--color-yellow-dark);
+    border-bottom-color: var(--color-yellow-light);
+    border-right-color: var(--color-yellow-light);
+    box-shadow: var(--shadow-yellow);
+}
+
+.btn-retro.btn-yellow:hover {
+    background-color: var(--color-yellow-light);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-yellow-dark);
+}
+
+.btn-retro.btn-yellow:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+    border-bottom-color: var(--color-yellow-dark);
+    border-right-color: var(--color-yellow-dark);
+    background-color: var(--color-yellow-dark);
+    color: var(--color-text);
+}
+
+/* -------------------------------------------------------------
+   9. FX TEST SECTION — Zona de prueba de efectos
+   ------------------------------------------------------------- */
+.fx-test {
+    border: var(--border-width) dashed var(--color-yellow-dark);
+    padding: var(--space-xl);
+    background-color: rgba(255, 200, 0, 0.03);
+    position: relative;
+}
+
+/* Etiqueta "TEMPORAL" esquinada */
+.fx-test::before {
+    content: 'TEMPORAL';
+    position: absolute;
+    top: -1px;
+    right: var(--space-md);
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xs);
+    color: var(--color-yellow);
+    background-color: var(--color-bg-dark);
+    padding: 2px 10px;
+    border: 2px solid var(--color-yellow-dark);
+    border-top: none;
+    letter-spacing: 1px;
+    animation: blink-tag 1.5s steps(2) infinite;
+}
+
+@keyframes blink-tag {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.fx-test__note {
+    font-size: var(--fs-md);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+    line-height: 1.5;
+}
+
+.fx-test__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+}
+
+/* -------------------------------------------------------------
+   10. MASCOT — Contenedor fijo inferior central
+   ------------------------------------------------------------- */
+#mascot-container {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-mascot);
+    /* Fondo que hace transición con el azul marino del body */
+    background: radial-gradient(
+        ellipse 140px 80px at 50% 0%,
+        var(--color-bg-light) 0%,
+        var(--color-bg) 70%,
+        transparent 100%
+    );
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 var(--space-xl) var(--space-sm);
+    pointer-events: none; /* No interfiere con clicks */
+}
+
+#mascot-img {
+    display: block;
+    /* Sombra para dar profundidad al personaje */
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    /* Animación idle sutil */
+    animation: mascot-idle 3s ease-in-out infinite;
+    image-rendering: pixelated; /* Si la imagen es pixel art */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+@keyframes mascot-idle {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+}
+
+/* -------------------------------------------------------------
+   11. SCROLLBAR PERSONALIZADA (estilo retro)
+   ------------------------------------------------------------- */
+::-webkit-scrollbar {
+    width: 14px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-bg-dark);
+    border-left: 2px solid var(--color-green-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-green-dark);
+    border: 2px solid var(--color-bg-dark);
+    border-right: none;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-green);
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--color-bg-dark);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-green-dark) var(--color-bg-dark);
+}
+
+/* -------------------------------------------------------------
+   12. UTILIDADES
+   ------------------------------------------------------------- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Efecto de texto parpadeante tipo cursor (usar con moderación) */
+.blink {
+    animation: blink-cursor 1s steps(1) infinite;
+}
+
+@keyframes blink-cursor {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* -------------------------------------------------------------
+   13. RESPONSIVE — Adaptaciones para tablets y móviles
+   ------------------------------------------------------------- */
+
+/* --- Tablets (<= 900px) --- */
+@media (max-width: 900px) {
+    #main-header {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .header-brand {
+        width: 100%;
+        text-align: center;
+    }
+
+    #main-nav {
+        justify-content: center;
+    }
+
+    .nav-dropdown__label {
+        display: none; /* Solo iconos en tablet */
+    }
+
+    .nav-dropdown__trigger {
+        padding: var(--space-sm);
+    }
+
+    #main-content {
+        padding: var(--space-lg);
+    }
+
+    .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: var(--space-md);
+    }
+
+    .hero-title {
+        font-size: var(--fs-lg);
+    }
+}
+
+/* --- Móviles (<= 600px) --- */
+@media (max-width: 600px) {
+    :root {
+        --border-width: 2px;
+    }
+
+    body {
+        padding-bottom: 120px;
+    }
+
+    .brand-title {
+        font-size: var(--fs-xs);
+    }
+
+    .brand-icon {
+        font-size: var(--fs-lg);
+    }
+
+    #main-nav {
+        gap: 2px;
+    }
+
+    .nav-dropdown__menu {
+        min-width: 180px;
+        left: auto;
+        right: 0;
+    }
+
+    #main-content {
+        padding: var(--space-md);
+        gap: var(--space-xl);
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tool-card {
+        padding: var(--space-md);
+    }
+
+    .hero-title {
+        font-size: var(--fs-md);
+        line-height: 1.8;
+    }
+
+    .hero-subtitle {
+        font-size: var(--fs-lg);
+    }
+
+    .section-title {
+        font-size: var(--fs-xs);
+    }
+
+    .fx-test__buttons {
+        flex-direction: column;
+    }
+
+    .btn-retro {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #mascot-img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #mascot-container {
+        background: radial-gradient(
+            ellipse 100px 60px at 50% 0%,
+            var(--color-bg-light) 0%,
+            var(--color-bg) 70%,
+            transparent 100%
+        );
+    }
+}
