@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu Chema 2.o — Dashboard Educativo</title>
+
+    <!-- Fuentes pixeladas retro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <!-- Hoja de estilos principal -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!--
+        Variables CSS raíz definidas aquí como base de diseño.
+        Se ampliarán en styles.css con componentes, layouts y animaciones.
+    -->
+    <style>
+        :root {
+            /* --- Paleta principal --- */
+            --color-bg:        #0b1a3e;   /* Azul Marino oscuro */
+            --color-bg-light:  #112355;   /* Azul Marino claro (cards, paneles) */
+            --color-bg-dark:   #060e24;   /* Azul Marino muy oscuro (bordes profundos) */
+
+            --color-green:     #00aa44;   /* Verde Bandera */
+            --color-green-light:#00cc55;  /* Verde Bandera claro (hover, acentos) */
+            --color-green-dark: #007730;  /* Verde Bandera oscuro (bordes hundidos) */
+
+            --color-yellow:    #ffc800;   /* Amarillo */
+            --color-yellow-light:#ffe066; /* Amarillo claro (hover, textos brillantes) */
+            --color-yellow-dark:#cc9f00;  /* Amarillo oscuro (bordes hundidos) */
+
+            /* --- Neutros sobre azul marino --- */
+            --color-text:      #e8edf5;   /* Texto principal */
+            --color-text-muted:#8a9bc0;   /* Texto secundario */
+            --color-border:    #1a3270;   /* Bordes sutiles */
+
+            /* --- Tipografía retro --- */
+            --font-pixel:      'Press Start 2P', monospace;
+            --font-retro:      'VT323', monospace;
+
+            /* --- Tamaños de fuente base --- */
+            --fs-xs:           0.625rem;   /* 10px */
+            --fs-sm:           0.75rem;    /* 12px */
+            --fs-md:           0.875rem;   /* 14px */
+            --fs-lg:           1rem;       /* 16px */
+            --fs-xl:           1.25rem;    /* 20px */
+            --fs-2xl:          1.5rem;     /* 24px */
+            --fs-3xl:          2rem;       /* 32px */
+            --fs-4xl:          2.5rem;     /* 40px */
+
+            /* --- Sombras estilo relieve retro --- */
+            --shadow-raised:   4px 4px 0px var(--color-green-dark);
+            --shadow-raised-sm:2px 2px 0px var(--color-green-dark);
+            --shadow-sunken:   inset 3px 3px 0px rgba(0,0,0,0.4), inset -2px -2px 0px rgba(255,255,255,0.05);
+            --shadow-yellow:   4px 4px 0px var(--color-yellow-dark);
+            --shadow-yellow-sm:2px 2px 0px var(--color-yellow-dark);
+
+            /* --- Espaciado --- */
+            --space-xs:        0.25rem;
+            --space-sm:        0.5rem;
+            --space-md:        1rem;
+            --space-lg:        1.5rem;
+            --space-xl:        2rem;
+            --space-2xl:       3rem;
+
+            /* --- Bordes --- */
+            --border-radius:   4px;
+            --border-width:    3px;
+
+            /* --- Transiciones --- */
+            --transition-fast: 0.1s ease;
+            --transition-mid:  0.2s ease;
+            --transition-slow: 0.4s ease;
+
+            /* --- Z-index layers --- */
+            --z-base:          1;
+            --z-dropdown:      100;
+            --z-sticky:        200;
+            --z-overlay:       500;
+            --z-fx-canvas:     999;
+            --z-mascot:        600;
+        }
+
+        /* Reset mínimo para que el HTML se vea decente sin styles.css */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-retro);
+            font-size: var(--fs-lg);
+            color: var(--color-text);
+            background-color: var(--color-bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+         CANVAS OVERLAY — Efectos visuales (fuegos artificiales, explosiones)
+         Ocupa toda la pantalla, por encima del contenido pero sin bloquear clicks.
+    ============================================================ -->
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+
+    <!-- ============================================================
+         HEADER — Barra de navegación superior con menús desplegables
+    ============================================================ -->
+    <header id="main-header">
+
+        <!-- Logo / Título -->
+        <div class="header-brand">
+            <h1 class="brand-title">
+                <span class="brand-icon">🎮</span>
+                Edu Chema <span class="brand-version">2.o</span>
+            </h1>
+        </div>
+
+        <!-- Navegación principal -->
+        <nav id="main-nav" aria-label="Menú principal">
+
+            <!-- Dropdown 1: Gestión de Tiempo -->
+            <div class="nav-dropdown" data-dropdown>
+
+                <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
+                    <span class="nav-dropdown__icon">⏱️</span>
+                    <span class="nav-dropdown__label">Gestión de Tiempo</span>
+                    <span class="nav-dropdown__arrow">▼</span>
+                </button>
+
+                <ul class="nav-dropdown__menu" role="menu">
+                    <li role="none">
+                        <button class="nav-dropdown__item" role="menuitem" data-tool="cronometro">
+                            <span class="item-icon">⏲️</span> Cronómetro
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button class="nav-dropdown__item" role="menuitem" data-tool="pomodoro">
+                            <span class="item-icon">🍅</span> Pomodoro
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Dropdown 2: Dinámicas Aleatorias -->
+            <div class="nav-dropdown" data-dropdown>
+
+                <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
+                    <span class="nav-dropdown__icon">🎲</span>
+                    <span class="nav-dropdown__label">Dinámicas Aleatorias</span>
+                    <span class="nav-dropdown__arrow">▼</span>
+                </button>
+
+                <ul class="nav-dropdown__menu" role="menu">
+                    <li role="none">
+                        <button class="nav-dropdown__item" role="menuitem" data-tool="ruleta">
+                            <span class="item-icon">🎡</span> Ruleta
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button class="nav-dropdown__item" role="menuitem" data-tool="papa-caliente">
+                            <span class="item-icon">💣</span> Papa Caliente
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Dropdown 3: Evaluación -->
+            <div class="nav-dropdown" data-dropdown>
+
+                <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
+                    <span class="nav-dropdown__icon">📊</span>
+                    <span class="nav-dropdown__label">Evaluación</span>
+                    <span class="nav-dropdown__arrow">▼</span>
+                </button>
+
+                <ul class="nav-dropdown__menu" role="menu">
+                    <li role="none">
+                        <button class="nav-dropdown__item" role="menuitem" data-tool="votacion">
+                            <span class="item-icon">👍</span> Votación
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button class="nav-dropdown__item" role="menuitem" data-tool="preguntas-equipo">
+                            <span class="item-icon">❓</span> Preguntas por Equipo
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+
+        <!-- Indicador de estado / audio -->
+        <div class="header-actions">
+            <button id="btn-sound-toggle" class="btn-icon" aria-label="Alternar sonido" title="Sonido ON/OFF">
+                🔊
+            </button>
+        </div>
+
+    </header>
+
+
+    <!-- ============================================================
+         MAIN — Contenido principal del dashboard
+    ============================================================ -->
+    <main id="main-content">
+
+        <!-- Hero / Bienvenida -->
+        <section id="hero-section" class="dashboard-section">
+            <div class="hero-content">
+                <h2 class="hero-title">¡Bienvenido al Dashboard!</h2>
+                <p class="hero-subtitle">
+                    Selecciona una herramienta del menú superior o usa los accesos rápidos de abajo.
+                    <br>¡A dinamizar la clase como un nivel final de boss!
+                </p>
+            </div>
+        </section>
+
+        <!-- Accesos rápidos — Tarjetas de herramientas -->
+        <section id="quick-access" class="dashboard-section">
+            <h3 class="section-title">⚡ Acceso Rápido</h3>
+
+            <div class="cards-grid">
+
+                <!-- Tarjeta: Cronómetro -->
+                <article class="tool-card" data-tool="cronometro" tabindex="0" role="button" aria-label="Abrir Cronómetro">
+                    <div class="tool-card__icon">⏲️</div>
+                    <h4 class="tool-card__title">Cronómetro</h4>
+                    <p class="tool-card__desc">Cuenta regresiva o ascendente con alertas visuales.</p>
+                    <span class="tool-card__tag tag-time">Tiempo</span>
+                </article>
+
+                <!-- Tarjeta: Pomodoro -->
+                <article class="tool-card" data-tool="pomodoro" tabindex="0" role="button" aria-label="Abrir Pomodoro">
+                    <div class="tool-card__icon">🍅</div>
+                    <h4 class="tool-card__title">Pomodoro</h4>
+                    <p class="tool-card__desc">Ciclos de 25 min de trabajo + 5 min de descanso.</p>
+                    <span class="tool-card__tag tag-time">Tiempo</span>
+                </article>
+
+                <!-- Tarjeta: Ruleta -->
+                <article class="tool-card" data-tool="ruleta" tabindex="0" role="button" aria-label="Abrir Ruleta">
+                    <div class="tool-card__icon">🎡</div>
+                    <h4 class="tool-card__title">Ruleta</h4>
+                    <p class="tool-card__desc">Gira la ruleta y selecciona un alumno o equipo al azar.</p>
+                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                </article>
+
+                <!-- Tarjeta: Papa Caliente -->
+                <article class="tool-card" data-tool="papa-caliente" tabindex="0" role="button" aria-label="Abrir Papa Caliente">
+                    <div class="tool-card__icon">💣</div>
+                    <h4 class="tool-card__title">Papa Caliente</h4>
+                    <p class="tool-card__desc">Cuenta atrás que explota cuando llega a cero.</p>
+                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                </article>
+
+                <!-- Tarjeta: Votación -->
+                <article class="tool-card" data-tool="votacion" tabindex="0" role="button" aria-label="Abrir Votación">
+                    <div class="tool-card__icon">👍</div>
+                    <h4 class="tool-card__title">Votación</h4>
+                    <p class="tool-card__desc">Sistema de votación rápida con resultados en tiempo real.</p>
+                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                </article>
+
+                <!-- Tarjeta: Preguntas por Equipo -->
+                <article class="tool-card" data-tool="preguntas-equipo" tabindex="0" role="button" aria-label="Abrir Preguntas por Equipo">
+                    <div class="tool-card__icon">❓</div>
+                    <h4 class="tool-card__title">Preguntas por Equipo</h4>
+                    <p class="tool-card__desc">Turnos de preguntas asignados por equipos.</p>
+                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- Panel de herramientas dinámico (aquí se cargan las herramientas al seleccionarlas) -->
+        <section id="tool-panel" class="dashboard-section" aria-live="polite">
+            <!-- El contenido de cada herramienta se inyectará aquí dinámicamente -->
+        </section>
+
+
+        <!-- ============================================================
+             SECCIÓN DE PRUEBA — Botones temporales para testear efectos FX
+             (Estos botones se eliminarán en producción)
+        ============================================================ -->
+        <section id="fx-test-section" class="dashboard-section fx-test">
+            <h3 class="section-title">🧪 Zona de Prueba — Efectos Visuales</h3>
+            <p class="fx-test__note">
+                Botones temporales para verificar las animaciones del canvas.
+                <br>Se eliminarán una vez integrados los efectos en las herramientas.
+            </p>
+
+            <div class="fx-test__buttons">
+                <button id="btn-test-fireworks" class="btn-retro btn-green" type="button">
+                    <span class="btn-retro__icon">🎆</span>
+                    Fuegos Artificiales
+                </button>
+
+                <button id="btn-test-explosion" class="btn-retro btn-yellow" type="button">
+                    <span class="btn-retro__icon">💥</span>
+                    Explosión Pixelada
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ============================================================
+         MASCOTA FIJA — Imagen Edu.png en la parte inferior central
+    ============================================================ -->
+    <div id="mascot-container" aria-hidden="true">
+        <img
+            id="mascot-img"
+            src="Edu.png"
+            alt=""
+            width="120"
+            height="120"
+            draggable="false"
+        >
+    </div>
+
+
+    <!-- ============================================================
+         SCRIPTS — Módulo ES6 principal
+    ============================================================ -->
+    <script type="module" src="main.js"></script>
+
+</body>
+
+</html>
