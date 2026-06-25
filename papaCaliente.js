@@ -1,222 +1,148 @@
 /* =============================================================
-   EDU CHEMA 2.o — Módulo: Papa Caliente 💣 (Con Sonido)
+   EDU CHEMA 2.o — Gestor de Audio Sintetizado (Web Audio API)
+   =============================================================
+   Genera efectos de sonido retro (8/16-bit) proceduralmente.
+   Reutilizable en cualquier módulo (Papa Caliente, Ruleta, etc.)
    ============================================================= */
 
-// Importaciones desde otros módulos
-import { playExplosion } from './main.js';
-import { playTick, playAlarm, playExplosionSound } from './audioManager.js';
+let audioCtx = null;
+
+/** Inicializa el AudioContext (debe llamarse tras una interacción del usuario) */
+function ensureContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
 
 /**
- * Inicializa la herramienta Papa Caliente dentro del contenedor dado.
- * @param {HTMLElement} container - El #tool-panel donde se inyectará la UI
+ * Genera un "Beep" simple (onda cuadrada, muy retro).
+ * @param {number} freq - Frecuencia en Hz (ej. 440 = La central)
+ * @param {number} duration - Duración en segundos
+ * @param {string} type - Tipo de onda ('square', 'sawtooth', 'triangle')
+ * @param {number} volume - Volumen de 0 a 1
  */
-export function init(container) {
+function playTone(freq, duration = 0.1, type = 'square', volume = 0.15) {
+    const ctx = ensureContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
 
-    // --- Estado interno del módulo ---
-    const state = {
-        timeLeft: 0,
-        maxTime: 0,
-        isRunning: false,
-        isExploded: false,
-        intervalId: null
-    };
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
-    // --- Inyección del HTML (Idéntico al anterior) ---
-    container.innerHTML = `
-        <button class="tool-panel__close" aria-label="Cerrar herramienta">✕ CERRAR</button>
-        <div class="pc-layout">
-            <div class="pc-controls">
-                <h3 class="section-title">💣 Configuración</h3>
-                <div class="pc-setting">
-                    <label for="pc-max-time">Tiempo Máximo (seg):</label>
-                    <div class="pc-input-group">
-                        <button class="btn-retro btn-green btn-sm" id="pc-time-down" aria-label="Reducir tiempo">-</button>
-                        <input type="number" id="pc-max-time" value="15" min="5" max="60" step="1" readonly>
-                        <button class="btn-retro btn-green btn-sm" id="pc-time-up" aria-label="Aumentar tiempo">+</button>
-                    </div>
-                </div>
-                <div class="pc-actions">
-                    <button id="pc-start-btn" class="btn-retro btn-green btn-block">
-                        <span class="btn-retro__icon">▶️</span> INICIAR
-                    </button>
-                    <button id="pc-stop-btn" class="btn-retro btn-yellow btn-block" disabled>
-                        <span class="btn-retro__icon">⏹️</span> DETENER
-                    </button>
-                </div>
-            </div>
-            <div class="pc-display-wrapper">
-                <div id="pc-display" class="pc-display" aria-live="assertive">
-                    <span class="pc-display__time" id="pc-time-text">--</span>
-                    <span class="pc-display__label">SEGUNDOS</span>
-                </div>
-                <p id="pc-status" class="pc-status">Ajusta el tiempo y pulsa INICIAR</p>
-            </div>
-        </div>
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
-        <!-- Estilos del módulo -->
-        <style>
-            .pc-layout { display: flex; gap: var(--space-2xl); align-items: flex-start; margin-top: var(--space-lg); }
-            .pc-controls { flex: 0 0 280px; display: flex; flex-direction: column; gap: var(--space-lg); }
-            .pc-setting label { display: block; font-family: var(--font-pixel); font-size: var(--fs-xs); color: var(--color-green-light); margin-bottom: var(--space-sm); }
-            .pc-input-group { display: flex; align-items: center; gap: var(--space-sm); }
-            .pc-input-group input { flex: 1; text-align: center; font-family: var(--font-pixel); font-size: var(--fs-xl); color: var(--color-yellow); background: var(--color-bg-dark); border: var(--border-width) solid var(--color-green-dark); border-bottom-color: var(--color-green); border-right-color: var(--color-green); box-shadow: inset 2px 2px 0px rgba(0,0,0,0.5); padding: var(--space-sm); width: 60px; -moz-appearance: textfield; }
-            .pc-input-group input::-webkit-outer-spin-button, .pc-input-group input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-            .btn-sm { padding: var(--space-xs) var(--space-sm) !important; font-size: 10px !important; min-width: 40px; justify-content: center; }
-            .btn-block { width: 100%; justify-content: center; }
-            .pc-actions { display: flex; flex-direction: column; gap: var(--space-sm); }
-            .pc-display-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--color-bg-dark); border: var(--border-width) solid var(--color-green-dark); padding: var(--space-2xl); box-shadow: var(--shadow-raised), inset 0 0 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
-            .pc-display-wrapper::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px); pointer-events: none; }
-            .pc-display { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); position: relative; z-index: 2; }
-            .pc-display__time { font-family: var(--font-pixel); font-size: 6rem; color: var(--color-green-light); text-shadow: 4px 4px 0 var(--color-green-dark); line-height: 1; transition: color 0.2s, text-shadow 0.2s; }
-            .pc-display__label { font-family: var(--font-pixel); font-size: var(--fs-xs); color: var(--color-text-muted); letter-spacing: 3px; }
-            .pc-status { margin-top: var(--space-lg); font-size: var(--fs-lg); color: var(--color-text-muted); text-align: center; position: relative; z-index: 2; }
-            
-            .pc-display.state-idle .pc-display__time { color: var(--color-text-muted); text-shadow: 3px 3px 0 rgba(0,0,0,0.5); }
-            .pc-display.state-running .pc-display__time { color: var(--color-green-light); text-shadow: 4px 4px 0 var(--color-green-dark), 0 0 20px rgba(0,204,85,0.4); animation: pc-pulse 1s ease-in-out infinite; }
-            .pc-display.state-danger .pc-display__time { color: var(--color-yellow); text-shadow: 4px 4px 0 var(--color-yellow-dark), 0 0 25px rgba(255,200,0,0.6); animation: pc-shake 0.15s linear infinite; }
-            .pc-display.state-critical .pc-display__time { color: #ff3333; text-shadow: 4px 4px 0 #880000, 0 0 30px rgba(255,0,0,0.8); animation: pc-extreme 0.08s linear infinite; }
-            .pc-display.state-boom .pc-display__time { color: #ff3333; text-shadow: 4px 4px 0 #880000; animation: none; transform: scale(1.3); }
-            .pc-display.state-boom .pc-display__label { color: #ff3333; }
-            
-            @keyframes pc-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-            @keyframes pc-shake { 0% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(-3px, 2px) rotate(-1deg); } 50% { transform: translate(3px, -2px) rotate(1deg); } 75% { transform: translate(-2px, -3px) rotate(-0.5deg); } 100% { transform: translate(2px, 3px) rotate(0.5deg); } }
-            @keyframes pc-extreme { 0% { transform: translate(0, 0) scale(1.1); } 25% { transform: translate(-5px, 3px) scale(0.95); } 50% { transform: translate(5px, -3px) scale(1.1); } 75% { transform: translate(-3px, -5px) scale(0.95); } 100% { transform: translate(3px, 5px) scale(1.1); } }
+    osc.connect(gain);
+    gain.connect(ctx.destination);
 
-            button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-            @media (max-width: 700px) {
-                .pc-layout { flex-direction: column-reverse; }
-                .pc-controls { flex: none; width: 100%; }
-                .pc-display__time { font-size: 4rem; }
-            }
-        </style>
-    `;
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+}
 
-    // --- Referencias al DOM ---
-    const dom = {
-        maxTimeInput: container.querySelector('#pc-max-time'),
-        timeDown: container.querySelector('#pc-time-down'),
-        timeUp: container.querySelector('#pc-time-up'),
-        startBtn: container.querySelector('#pc-start-btn'),
-        stopBtn: container.querySelector('#pc-stop-btn'),
-        display: container.querySelector('#pc-display'),
-        timeText: container.querySelector('#pc-time-text'),
-        status: container.querySelector('#pc-status')
-    };
+// --- SONIDOS ESPECÍFICOS ---
 
-    // --- Funciones de Control ---
+/**
+ * 🕐 Tick de reloj (para cronómetros y cuenta atrás).
+ * @param {boolean} isDanger - Si es true, suena más agudo y grave.
+ */
+export function playTick(isDanger = false) {
+    if (isDanger) {
+        playTone(880, 0.08, 'square', 0.2);  // Agudo
+        setTimeout(() => playTone(440, 0.08, 'square', 0.15), 50); // Grave rápido
+    } else {
+        playTone(600, 0.05, 'square', 0.1);
+    }
+}
 
-    function updateUI() {
-        dom.timeText.textContent = state.isRunning || state.isExploded ? state.timeLeft : '--';
-        
-        dom.display.className = 'pc-display';
-        if (state.isExploded) {
-            dom.display.classList.add('state-boom');
-        } else if (state.isRunning) {
-            if (state.timeLeft <= 3) dom.display.classList.add('state-critical');
-            else if (state.timeLeft <= 5) dom.display.classList.add('state-danger');
-            else dom.display.classList.add('state-running');
-        } else {
-            dom.display.classList.add('state-idle');
-        }
+/**
+ * 🚨 Alarma de cuenta atrás final (bip-bip-bip rápido).
+ */
+export function playAlarm() {
+    playTone(1000, 0.1, 'sawtooth', 0.25);
+    setTimeout(() => playTone(800, 0.1, 'sawtooth', 0.2), 120);
+}
 
-        dom.startBtn.disabled = state.isRunning;
-        dom.stopBtn.disabled = !state.isRunning;
-        dom.timeDown.disabled = state.isRunning;
-        dom.timeUp.disabled = state.isRunning;
+/**
+ * 💥 Explosión retro (Ruido blanco filtrado con decaimiento rápido).
+ */
+export function playExplosionSound() {
+    const ctx = ensureContext();
+    const bufferSize = ctx.sampleRate * 0.6; // 0.6 segundos de duración
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Generar ruido blanco
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1);
     }
 
-    function tick() {
-        state.timeLeft--;
-        
-        // --- LÓGICA DE SONIDO AÑADIDA ---
-        if (state.timeLeft <= 3 && state.timeLeft > 0) {
-            playAlarm(); // Sonido de pánico
-        } else if (state.timeLeft <= 5 && state.timeLeft > 0) {
-            playTick(true); // Tick de peligro
-        } else if (state.timeLeft > 0) {
-            playTick(false); // Tick normal
-        }
-        // ----------------------------------
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
 
-        updateUI();
+    // Filtro de paso bajo que se cierra rápidamente (efecto de explosión)
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(3000, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.5);
 
-        if (state.timeLeft <= 0) {
-            explode();
-        }
-    }
+    // Control de volumen con decaimiento
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.6, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
 
-    function startGame() {
-        if (state.isRunning) return;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
 
-        state.maxTime = parseInt(dom.maxTimeInput.value, 10) || 15;
-        state.timeLeft = Math.floor(Math.random() * (state.maxTime - 2)) + 3;
-        state.isRunning = true;
-        state.isExploded = false;
+    source.start(ctx.currentTime);
+}
 
-        dom.status.textContent = '¡Pásalo! ¡Pásalo!';
-        
-        // Pequeño sonido de inicio
-        playTick(false);
+/**
+ * 🎆 Whoosh de fuego artificial (ascendente rápido).
+ */
+export function playWhoosh() {
+    const ctx = ensureContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
 
-        state.intervalId = setInterval(tick, 1000);
-        updateUI();
-    }
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(100, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.4);
 
-    function stopGame() {
-        if (!state.isRunning) return;
-        clearInterval(state.intervalId);
-        state.isRunning = false;
-        dom.status.textContent = 'Detenido a tiempo...';
-        updateUI();
-    }
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1000, ctx.currentTime);
+    filter.Q.setValueAtTime(2, ctx.currentTime);
 
-    function explode() {
-        clearInterval(state.intervalId);
-        state.isRunning = false;
-        state.isExploded = true;
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
 
-        dom.timeText.textContent = 'BOOM!';
-        dom.status.textContent = '💥 ¡BOOOM! ¡A quién le tocó!';
-        updateUI();
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
 
-        const rect = dom.display.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-        
-        // --- SONIDO DE EXPLOSIÓN ---
-        playExplosionSound();
-        // ----------------------------
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+}
 
-        // Efecto visual
-        playExplosion(x, y);
-        setTimeout(() => {
-            playExplosion(x + (Math.random()-0.5)*100, y + (Math.random()-0.5)*60);
-        }, 200);
-    }
-
-    function changeTime(delta) {
-        let val = parseInt(dom.maxTimeInput.value, 10) + delta;
-        val = Math.max(5, Math.min(60, val));
-        dom.maxTimeInput.value = val;
-    }
-
-    // --- Event Listeners ---
-    dom.startBtn.addEventListener('click', startGame);
-    dom.stopBtn.addEventListener('click', stopGame);
-    dom.timeDown.addEventListener('click', () => changeTime(-1));
-    dom.timeUp.addEventListener('click', () => changeTime(1));
-
-    container.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT') return;
-        if (e.code === 'Space') {
-            e.preventDefault();
-            state.isRunning ? stopGame() : startGame();
-        }
+/**
+ * 🎉 Sonido de éxito/victoria (Arpegio ascendente alegre).
+ */
+export function playSuccess() {
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // Do, Mi, Sol, Do agudo
+    notes.forEach((freq, i) => {
+        setTimeout(() => playTone(freq, 0.15, 'square', 0.12), i * 100);
     });
+}
 
-    return {
-        destroy() {
-            clearInterval(state.intervalId);
-        }
-    };
+/**
+ * ❌ Sonido de error/fallo (Bajo descendente).
+ */
+export function playError() {
+    playTone(200, 0.15, 'sawtooth', 0.2);
+    setTimeout(() => playTone(150, 0.25, 'sawtooth', 0.2), 150);
 }
