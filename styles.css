@@ -671,3 +671,62 @@ body {
 @keyframes blink {
     50% { opacity: 0; }
 }
+/* ----------------------------------------------------------
+   METRÓNOMO VISUAL (Estilos Específicos)
+   ---------------------------------------------------------- */
+.metro-container {
+    gap: var(--space-xl);
+}
+
+.metro-bpm-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.metro-bpm-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.metro-bpm-display span:first-child {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-4xl);
+    color: var(--color-yellow);
+    text-shadow: 3px 3px 0px var(--color-yellow-dark);
+}
+
+.metro-bpm-label {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+}
+
+/* Zona visual del latido */
+.metro-visual {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-bg-dark);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 50%;
+    box-shadow: var(--shadow-sunken);
+}
+
+.metro-heart {
+    width: 50px;
+    height: 50px;
+    background-color: var(--color-green-dark);
+    border-radius: 4px; /* Cuadrado pixelado */
+    transition: transform 0.05s ease, background-color 0.05s ease, box-shadow 0.05s ease;
+}
+
+/* Estado cuando late */
+.metro-beat {
+    transform: scale(1.8);
+    background-color: var(--color-green-light);
+    box-shadow: 0 0 20px var(--color-green-light);
+}
