@@ -1,6 +1,408 @@
+/* ============================================================
+   EDU CHEMA 2.0 — HOJA DE ESTILOS PRINCIPAL
+   ============================================================
+   ÍNDICE:
+   1. Variables y Reset
+   2. Tipografía y Utilidades
+   3. Layout Principal
+   4. Cabecera y Navegación
+   5. Tarjetas de Herramientas
+   6. Panel de Herramientas (Vacio / Cargado)
+   7. Botones y Formularios
+   8. Zona de Pruebas FX
+   9. Canvas de Efectos Visuales
+   10. Animaciones (Keyframes)
+   ============================================================ */
+
 /* ----------------------------------------------------------
-   TOOL LOADED (Inyectado por JS)
+   1. VARIABLES Y RESET
    ---------------------------------------------------------- */
+:root {
+    /* Colores */
+    --color-bg:        #0b1a3e;
+    --color-bg-light:  #112355;
+    --color-bg-dark:   #060e24;
+    --color-green:     #00aa44;
+    --color-green-light:#00cc55;
+    --color-green-dark: #007730;
+    --color-yellow:    #ffc800;
+    --color-yellow-light:#ffe066;
+    --color-yellow-dark:#cc9f00;
+    --color-text:      #e8edf5;
+    --color-text-muted:#8a9bc0;
+    --color-border:    #1a3270;
+    
+    /* Tipografía */
+    --font-pixel:      'Press Start 2P', monospace;
+    --font-retro:      'VT323', monospace;
+    
+    /* Tamaños de fuente */
+    --fs-xs: 0.625rem; --fs-sm: 0.75rem; --fs-md: 0.875rem; --fs-lg: 1rem;
+    --fs-xl: 1.25rem;  --fs-2xl: 1.5rem; --fs-3xl: 2rem;  --fs-4xl: 2.5rem;
+    
+    /* Sombras 3D (Retro) */
+    --shadow-raised:   4px 4px 0px var(--color-green-dark);
+    --shadow-raised-sm:2px 2px 0px var(--color-green-dark);
+    --shadow-sunken:   inset 3px 3px 0px rgba(0,0,0,0.4), inset -2px -2px 0px rgba(255,255,255,0.05);
+    --shadow-yellow:   4px 4px 0px var(--color-yellow-dark);
+    --shadow-yellow-sm:2px 2px 0px var(--color-yellow-dark);
+    
+    /* Espaciado */
+    --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem; --space-lg: 1.5rem;
+    --space-xl: 2rem;    --space-2xl: 3rem;
+    
+    /* Bordes y Transiciones */
+    --border-radius:   4px;
+    --border-width:    3px;
+    --transition-fast: 0.1s ease; 
+    --transition-mid:  0.2s ease;
+    
+    /* Z-index */
+    --z-base: 1; --z-dropdown: 100; --z-sticky: 200; 
+    --z-overlay: 500; --z-fx-canvas: 999; --z-mascot: 600;
+}
+
+*, *::before, *::after { 
+    margin: 0; padding: 0; box-sizing: border-box; 
+}
+
+/* ----------------------------------------------------------
+   2. TIPOGRAFÍA Y UTILIDADES
+   ---------------------------------------------------------- */
+body {
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+    /* Patrón de cuadrícula retro */
+    background-image:
+        linear-gradient(rgba(26, 50, 112, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 50, 112, 0.25) 1px, transparent 1px);
+    background-size: 32px 32px;
+    line-height: 1.4;
+}
+
+.brand-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-2xl);
+    color: var(--color-yellow);
+    text-shadow: 3px 3px 0px var(--color-yellow-dark);
+    letter-spacing: 2px;
+}
+
+.brand-version {
+    color: var(--color-green-light);
+    font-size: var(--fs-md);
+    text-shadow: 2px 2px 0px var(--color-green-dark);
+}
+
+.section-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xl);
+    color: var(--color-yellow);
+    text-shadow: 2px 2px 0px var(--color-yellow-dark);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+/* Enlace de accesibilidad para saltar el menú */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: var(--color-yellow);
+    color: var(--color-bg-dark);
+    padding: var(--space-sm) var(--space-md);
+    z-index: 10000;
+    font-family: var(--font-pixel);
+    font-size: var(--fs-sm);
+    text-decoration: none;
+}
+.skip-link:focus { top: 0; }
+
+/* ----------------------------------------------------------
+   3. LAYOUT PRINCIPAL
+   ---------------------------------------------------------- */
+#main-content {
+    padding-top: 140px; /* Espacio para la cabecera fija */
+    padding-bottom: var(--space-2xl);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+}
+
+.dashboard-section {
+    margin-bottom: var(--space-2xl);
+}
+
+/* Hero Section */
+.hero-content {
+    text-align: center;
+    padding: var(--space-xl);
+    background-color: var(--color-bg-light);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-raised);
+}
+
+.hero-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-3xl);
+    color: var(--color-green-light);
+    text-shadow: 4px 4px 0px var(--color-green-dark);
+    margin-bottom: var(--space-md);
+}
+
+.hero-subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--fs-xl);
+}
+
+/* ----------------------------------------------------------
+   4. CABECERA Y NAVEGACIÓN
+   ---------------------------------------------------------- */
+#main-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: var(--z-sticky);
+    background-color: var(--color-bg-dark);
+    border-bottom: var(--border-width) solid var(--color-green-dark);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+}
+
+.header-top-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-md) 0;
+    background-color: var(--color-bg);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.header-mascot {
+    width: 60px; height: 60px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    filter: drop-shadow(2px 2px 0 var(--color-green-dark));
+    animation: mascot-idle 3s ease-in-out infinite;
+}
+.header-mascot--right { animation-delay: 0.5s; }
+
+.header-bottom-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-xl);
+    flex-wrap: wrap;
+}
+
+/* Navegación Principal */
+#main-nav {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nav-dropdown { position: relative; }
+
+.nav-dropdown__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background-color: var(--color-bg-light);
+    color: var(--color-text);
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    padding: var(--space-sm) var(--space-md);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow: var(--shadow-raised-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.nav-dropdown__trigger:hover, .nav-dropdown__trigger:focus-visible {
+    background-color: var(--color-border);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px var(--color-green-dark);
+    outline: none;
+}
+
+.nav-dropdown__trigger:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px var(--color-green-dark);
+}
+
+.nav-dropdown__arrow {
+    font-size: var(--fs-sm);
+    transition: transform var(--transition-mid);
+}
+
+/* Menú Desplegable */
+.nav-dropdown__menu {
+    position: absolute;
+    top: calc(100% + var(--space-xs));
+    left: 0;
+    min-width: 240px;
+    background-color: var(--color-bg-light);
+    border: var(--border-width) solid var(--color-yellow);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-yellow);
+    padding: var(--space-sm) 0;
+    list-style: none;
+    z-index: var(--z-dropdown);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity var(--transition-mid), transform var(--transition-mid), visibility var(--transition-mid);
+}
+
+/* Estado Abierto (Controlado por JS) */
+.nav-dropdown.is-open .nav-dropdown__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.nav-dropdown.is-open .nav-dropdown__arrow { transform: rotate(180deg); }
+
+.nav-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    padding: var(--space-sm) var(--space-md);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-dropdown__item:hover, .nav-dropdown__item:focus-visible {
+    background-color: var(--color-yellow-dark);
+    color: var(--color-bg-dark);
+    outline: none;
+}
+
+/* Botón Icono (Sonido) */
+.btn-icon {
+    background: none; border: none;
+    font-size: var(--fs-xl);
+    cursor: pointer;
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
+    transition: transform var(--transition-fast);
+}
+.btn-icon:hover { transform: scale(1.2); }
+
+/* ----------------------------------------------------------
+   5. TARJETAS DE HERRAMIENTAS
+   ---------------------------------------------------------- */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-lg);
+}
+
+.tool-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg-light);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--space-lg);
+    text-decoration: none; /* Reseteo por ser <a> */
+    color: var(--color-text);
+    box-shadow: var(--shadow-raised);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-card:hover, .tool-card:focus-visible {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0px var(--color-green-dark);
+    outline: none;
+    border-color: var(--color-green);
+}
+
+.tool-card:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0px 0px 0px var(--color-green-dark);
+}
+
+.tool-card__icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+}
+
+.tool-card__title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-md);
+    color: var(--color-yellow-light);
+    margin-bottom: var(--space-sm);
+}
+
+.tool-card__desc {
+    font-size: var(--fs-xl);
+    color: var(--color-text-muted);
+    flex-grow: 1; /* Empuja el tag hacia abajo */
+    margin-bottom: var(--space-md);
+}
+
+.tool-card__tag {
+    align-self: flex-start;
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 2px;
+    border: 2px solid transparent;
+}
+
+/* Colores de Tags */
+.tag-time { background-color: var(--color-green-dark); color: var(--color-green-light); border-color: var(--color-green); }
+.tag-random { background-color: var(--color-yellow-dark); color: var(--color-bg-dark); border-color: var(--color-yellow); }
+.tag-eval { background-color: #5c1a7a; color: #e0a0ff; border-color: #8a2be2; } /* Púrpura */
+.tag-game { background-color: #7a1a1a; color: #ffa0a0; border-color: #be2b2b; } /* Rojo */
+
+/* ----------------------------------------------------------
+   6. PANEL DE HERRAMIENTAS (Vacio / Cargado)
+   ---------------------------------------------------------- */
+#tool-panel {
+    min-height: 300px;
+    border: var(--border-width) dashed var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: rgba(17, 35, 85, 0.4);
+    padding: var(--space-xl);
+}
+
+.tool-panel__empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: inherit;
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+.tool-panel__empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-md);
+    animation: mascot-idle 2s ease-in-out infinite;
+}
+
+/* Estado Cargado (Inyectado por JS) */
 .tool-loaded {
     background-color: var(--color-bg-light);
     border: var(--border-width) solid var(--color-green);
@@ -20,11 +422,100 @@
     gap: var(--space-md);
 }
 
-.tool-loaded__header .section-title {
-    margin-bottom: 0; /* Quitamos el margin por defecto */
-}
+.tool-loaded__header .section-title { margin-bottom: 0; }
 
 .tool-loaded__body {
     font-size: var(--fs-xl);
     color: var(--color-text-muted);
+}
+
+/* ----------------------------------------------------------
+   7. BOTONES Y FORMULARIOS
+   ---------------------------------------------------------- */
+.btn-retro {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-sm);
+    padding: var(--space-md) var(--space-lg);
+    border: var(--border-width) solid transparent;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    display: inline-flex; 
+    align-items: center; 
+    gap: var(--space-sm);
+    text-decoration: none;
+}
+
+.btn-retro:active { 
+    transform: translate(3px, 3px); 
+    box-shadow: 0 0 0 transparent !important; 
+}
+
+.btn-green {
+    background-color: var(--color-green);
+    color: var(--color-bg-dark);
+    border-color: var(--color-green-light);
+    box-shadow: var(--shadow-raised);
+}
+.btn-green:hover, .btn-green:focus-visible { 
+    transform: translate(-2px, -2px); 
+    box-shadow: 6px 6px 0px var(--color-green-dark); 
+    outline: none;
+}
+
+.btn-yellow {
+    background-color: var(--color-yellow);
+    color: var(--color-bg-dark);
+    border-color: var(--color-yellow-light);
+    box-shadow: var(--shadow-yellow);
+}
+.btn-yellow:hover, .btn-yellow:focus-visible { 
+    transform: translate(-2px, -2px); 
+    box-shadow: 6px 6px 0px var(--color-yellow-dark); 
+    outline: none;
+}
+
+/* ----------------------------------------------------------
+   8. ZONA DE PRUEBAS FX
+   ---------------------------------------------------------- */
+.fx-test {
+    text-align: center;
+    border: var(--border-width) solid var(--color-yellow-dark);
+    background-color: rgba(255, 200, 0, 0.05);
+    border-radius: var(--border-radius);
+    padding: var(--space-xl);
+}
+
+.fx-test__note {
+    margin-bottom: var(--space-lg);
+    color: var(--color-text-muted);
+    font-size: var(--fs-xl);
+}
+
+.fx-test__buttons {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ----------------------------------------------------------
+   9. CANVAS DE EFECTOS VISUALES
+   ---------------------------------------------------------- */
+#fx-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Permite hacer clic a través del canvas */
+    z-index: var(--z-fx-canvas);
+}
+
+/* ----------------------------------------------------------
+   10. ANIMACIONES (KEYFRAMES)
+   ---------------------------------------------------------- */
+@keyframes mascot-idle { 
+    0%, 100% { transform: translateY(0); } 
+    50% { transform: translateY(-6px); } 
 }
