@@ -576,3 +576,26 @@ body {
     background-color: var(--color-text-muted);
     border-color: var(--color-border);
 }
+/* ----------------------------------------------------------
+   POMODORO (Estilos Específicos)
+   ---------------------------------------------------------- */
+.pomo-status {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-lg);
+    color: var(--color-yellow);
+    text-shadow: 2px 2px 0px var(--color-yellow-dark);
+    margin-bottom: var(--space-md);
+    text-align: center;
+}
+
+.pomo-work {
+    color: #ff4757 !important; /* Rojo para trabajar */
+    border-color: #ff4757 !important;
+    text-shadow: 0 0 10px #ff4757 !important;
+}
+
+.pomo-break {
+    color: #00cc55 !important; /* Verde para descansar */
+    border-color: #00cc55 !important;
+    text-shadow: 0 0 10px #00cc55 !important;
+}
