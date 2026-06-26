@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edu Chema 2.0 — Dashboard Educativo</title>
 
+    <!-- ¡IMPORTANTE! Esta etiqueta soluciona las rutas en GitHub Pages -->
+    <base href="/CHEMA-edu-2.0/">
+
     <!-- Fuentes pixeladas retro -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,52 +16,22 @@
 
     <!-- Hoja de estilos principal -->
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Solo Variables de diseño en el head (Lo demás va a styles.css) -->
-    <style>
-        :root {
-            --color-bg:        #0b1a3e;
-            --color-bg-light:  #112355;
-            --color-bg-dark:   #060e24;
-            --color-green:     #00aa44;
-            --color-green-light:#00cc55;
-            --color-green-dark: #007730;
-            --color-yellow:    #ffc800;
-            --color-yellow-light:#ffe066;
-            --color-yellow-dark:#cc9f00;
-            --color-text:      #e8edf5;
-            --color-text-muted:#8a9bc0;
-            --color-border:    #1a3270;
-            --font-pixel:      'Press Start 2P', monospace;
-            --font-retro:      'VT323', monospace;
-            --fs-xs: 0.625rem; --fs-sm: 0.75rem; --fs-md: 0.875rem; --fs-lg: 1rem;
-            --fs-xl: 1.25rem;  --fs-2xl: 1.5rem; --fs-3xl: 2rem;  --fs-4xl: 2.5rem;
-            --shadow-raised:   4px 4px 0px var(--color-green-dark);
-            --shadow-raised-sm:2px 2px 0px var(--color-green-dark);
-            --shadow-sunken:   inset 3px 3px 0px rgba(0,0,0,0.4), inset -2px -2px 0px rgba(255,255,255,0.05);
-            --shadow-yellow:   4px 4px 0px var(--color-yellow-dark);
-            --shadow-yellow-sm:2px 2px 0px var(--color-yellow-dark);
-            --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem; --space-lg: 1.5rem;
-            --space-xl: 2rem;    --space-2xl: 3rem;
-            --border-radius:   4px;
-            --border-width:    3px;
-            --transition-fast: 0.1s ease; --transition-mid: 0.2s ease; --transition-slow: 0.4s ease;
-            --z-base: 1; --z-dropdown: 100; --z-sticky: 200; --z-overlay: 500; --z-fx-canvas: 999; --z-mascot: 600;
-        }
-    </style>
 </head>
 
 <body>
+
+    <!-- Enlace de accesibilidad para saltar el menú (ideal para teclado/lectores de pantalla) -->
+    <a href="#main-content" class="skip-link">⏩ Saltar al contenido</a>
 
     <!-- CANVAS OVERLAY PARA EFECTOS VISUALES -->
     <canvas id="fx-canvas" aria-hidden="true"></canvas>
 
     <!-- ============================================================
-         HEADER — Cabecera fija con imágenes y navegación
+         HEADER — Cabecera fija
     ============================================================ -->
     <header id="main-header">
         
-        <!-- Fila superior: Imágenes y Título -->
+        <!-- Fila superior: Mascotas y Título -->
         <div class="header-top-bar">
             <img src="edu2.png" class="header-mascot header-mascot--left" alt="Mascota Edu Izquierda" width="60" height="60" draggable="false">
             <div class="header-brand">
@@ -73,11 +46,11 @@
         <div class="header-bottom-bar">
             <nav id="main-nav" aria-label="Menú principal de herramientas">
 
-                <!-- Dropdown 1: Gestión de Tiempo -->
+                <!-- Dropdown 1: Control de Tiempo -->
                 <div class="nav-dropdown" data-dropdown>
                     <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
                         <span class="nav-dropdown__icon" aria-hidden="true">⏱️</span>
-                        <span class="nav-dropdown__label">Tiempo</span>
+                        <span class="nav-dropdown__label">Tiempos</span>
                         <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
                     </button>
                     <ul class="nav-dropdown__menu" role="menu">
@@ -88,45 +61,45 @@
                     </ul>
                 </div>
 
-                <!-- Dropdown 2: Dinámicas Aleatorias -->
+                <!-- Dropdown 2: Suerte y Azar -->
                 <div class="nav-dropdown" data-dropdown>
                     <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
                         <span class="nav-dropdown__icon" aria-hidden="true">🎲</span>
-                        <span class="nav-dropdown__label">Aleatorias</span>
+                        <span class="nav-dropdown__label">Suerte y Azar</span>
                         <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
                     </button>
                     <ul class="nav-dropdown__menu" role="menu">
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="ruleta"><span class="item-icon" aria-hidden="true">🎡</span> Ruleta</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="papa-caliente"><span class="item-icon" aria-hidden="true">💣</span> Papa Caliente</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="dados-virtuales"><span class="item-icon" aria-hidden="true">🎲</span> Dados Virtuales</button></li>
-                        <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="generador-equipos"><span class="item-icon" aria-hidden="true">👥</span> Generador de Equipos</button></li>
+                        <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="generador-equipos"><span class="item-icon" aria-hidden="true">👥</span> Mezclar Equipos</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="lanza-moneda"><span class="item-icon" aria-hidden="true">🪙</span> Lanza Moneda</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="4-esquinas"><span class="item-icon" aria-hidden="true">🏠</span> 4 Esquinas</button></li>
                     </ul>
                 </div>
 
-                <!-- Dropdown 3: Evaluación -->
+                <!-- Dropdown 3: Puntos y Votos -->
                 <div class="nav-dropdown" data-dropdown>
                     <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
                         <span class="nav-dropdown__icon" aria-hidden="true">📊</span>
-                        <span class="nav-dropdown__label">Evaluación</span>
+                        <span class="nav-dropdown__label">Puntos y Votos</span>
                         <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
                     </button>
                     <ul class="nav-dropdown__menu" role="menu">
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="votacion"><span class="item-icon" aria-hidden="true">👍</span> Votación</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="preguntas-equipo"><span class="item-icon" aria-hidden="true">❓</span> Preguntas por Equipo</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="tabla-puntos"><span class="item-icon" aria-hidden="true">🏆</span> Tabla de Puntos</button></li>
-                        <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="radar-asistencia"><span class="item-icon" aria-hidden="true">📋</span> Radar de Asistencia</button></li>
+                        <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="radar-asistencia"><span class="item-icon" aria-hidden="true">📋</span> Pasar Lista</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="votacion-rapida-ab"><span class="item-icon" aria-hidden="true">🅰️</span> Votación Rápida A/B</button></li>
                         <li role="none"><button class="nav-dropdown__item" role="menuitem" data-tool="semaforo-comportamiento"><span class="item-icon" aria-hidden="true">🚦</span> Semáforo Comport.</button></li>
                     </ul>
                 </div>
 
-                <!-- Dropdown 4: Juegos y Herramientas -->
+                <!-- Dropdown 4: Juegos y Dinámicas -->
                 <div class="nav-dropdown" data-dropdown>
                     <button class="nav-dropdown__trigger" aria-haspopup="true" aria-expanded="false">
-                        <span class="nav-dropdown__icon" aria-hidden="true">🛠️</span>
-                        <span class="nav-dropdown__label">Juegos/Herram.</span>
+                        <span class="nav-dropdown__icon" aria-hidden="true">🎮</span>
+                        <span class="nav-dropdown__label">Juegos</span>
                         <span class="nav-dropdown__arrow" aria-hidden="true">▼</span>
                     </button>
                     <ul class="nav-dropdown__menu" role="menu">
@@ -153,217 +126,216 @@
 
 
     <!-- ============================================================
-         MAIN — Contenido principal (Tarjetas y Paneles)
+         MAIN — Contenido principal
     ============================================================ -->
     <main id="main-content">
 
         <!-- Hero / Bienvenida -->
         <section id="hero-section" class="dashboard-section">
             <div class="hero-content">
-                <h2 class="hero-title">¡Bienvenido al Dashboard!</h2>
+                <h2 class="hero-title">¡Hola, equipo! 🚀</h2>
                 <p class="hero-subtitle">
-                    Selecciona una herramienta del menú superior o usa los accesos rápidos de abajo.
-                    <br>¡A dinamizar la clase como un nivel final de boss!
+                    Elige tu superpoder para la clase de hoy. ¡Hagamos que aprender sea un juego!
                 </p>
             </div>
         </section>
 
-        <!-- Panel dinámico de herramientas (Movido arriba para que se vea primero al cargar) -->
+        <!-- Panel dinámico de herramientas (Aparece aquí al hacer clic) -->
         <section id="tool-panel" class="dashboard-section" aria-live="polite">
             <div class="tool-panel__empty-state">
-                <span class="tool-panel__empty-icon">🎮</span>
-                <p>Selecciona una herramienta para comenzar la partida</p>
+                <span class="tool-panel__empty-icon">🕹️</span>
+                <p>Selecciona una herramienta para empezar a jugar</p>
             </div>
         </section>
 
         <!-- Accesos rápidos -->
         <section id="quick-access" class="dashboard-section">
-            <h3 class="section-title">⚡ Acceso Rápido</h3>
+            <h3 class="section-title">⚡ Elige tu Herramienta</h3>
             <div class="cards-grid">
 
-                <!-- Tiempo -->
+                <!-- TIEMPO -->
                 <a href="#tool-panel" class="tool-card" data-tool="cronometro">
                     <div class="tool-card__icon" aria-hidden="true">⏲️</div>
                     <h4 class="tool-card__title">Cronómetro</h4>
-                    <p class="tool-card__desc">Cuenta regresiva o ascendente con alertas visuales.</p>
+                    <p class="tool-card__desc">¿Cuánto tiempo nos queda? Cuenta hacia adelante o atrás.</p>
                     <span class="tool-card__tag tag-time">Tiempo</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="pomodoro">
                     <div class="tool-card__icon" aria-hidden="true">🍅</div>
                     <h4 class="tool-card__title">Pomodoro</h4>
-                    <p class="tool-card__desc">Ciclos de 25 min de trabajo + 5 min de descanso.</p>
+                    <p class="tool-card__desc">Ratitos de trabajo y descanso para no cansarse.</p>
                     <span class="tool-card__tag tag-time">Tiempo</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="temporizador-exposicion">
                     <div class="tool-card__icon" aria-hidden="true">🎤</div>
                     <h4 class="tool-card__title">Temp. Exposición</h4>
-                    <p class="tool-card__desc">Cronómetro visual grande para exposiciones orales.</p>
+                    <p class="tool-card__desc">Tu tiempo en la pista. ¡Que no se te pase!</p>
                     <span class="tool-card__tag tag-time">Tiempo</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="metronomo-visual">
                     <div class="tool-card__icon" aria-hidden="true">🎵</div>
                     <h4 class="tool-card__title">Metrónomo Visual</h4>
-                    <p class="tool-card__desc">Marca el ritmo para lectura coral o ejercicios físicos.</p>
+                    <p class="tool-card__desc">Marcamos el ritmo juntos. ¡Tic, tac, tic, tac!</p>
                     <span class="tool-card__tag tag-time">Tiempo</span>
                 </a>
 
-                <!-- Aleatorias -->
+                <!-- SUERTE Y AZAR -->
                 <a href="#tool-panel" class="tool-card" data-tool="ruleta">
                     <div class="tool-card__icon" aria-hidden="true">🎡</div>
                     <h4 class="tool-card__title">Ruleta</h4>
-                    <p class="tool-card__desc">Gira la ruleta y selecciona un alumno o equipo al azar.</p>
-                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                    <p class="tool-card__desc">¡Gira la ruleta y a ver quién sale!</p>
+                    <span class="tool-card__tag tag-random">Azar</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="papa-caliente">
                     <div class="tool-card__icon" aria-hidden="true">💣</div>
                     <h4 class="tool-card__title">Papa Caliente</h4>
-                    <p class="tool-card__desc">Cuenta atrás que explota cuando llega a cero.</p>
-                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                    <p class="tool-card__desc">¡Pasa la papa rápido antes de que explote! 💥</p>
+                    <span class="tool-card__tag tag-random">Azar</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="dados-virtuales">
                     <div class="tool-card__icon" aria-hidden="true">🎲</div>
                     <h4 class="tool-card__title">Dados Virtuales</h4>
-                    <p class="tool-card__desc">Lanza 1 o 2 dados para formar equipos o elegir preguntas.</p>
-                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                    <p class="tool-card__desc">¡Tira los dados y a ver qué número sale!</p>
+                    <span class="tool-card__tag tag-random">Azar</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="generador-equipos">
                     <div class="tool-card__icon" aria-hidden="true">👥</div>
-                    <h4 class="tool-card__title">Generador Equipos</h4>
-                    <p class="tool-card__desc">Mezcla la clase aleatoriamente en X equipos.</p>
-                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                    <h4 class="tool-card__title">Mezclar Equipos</h4>
+                    <p class="tool-card__desc">Agrega nombres y mezcla la clase en equipos.</p>
+                    <span class="tool-card__tag tag-random">Azar</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="lanza-moneda">
                     <div class="tool-card__icon" aria-hidden="true">🪙</div>
                     <h4 class="tool-card__title">Lanza Moneda</h4>
-                    <p class="tool-card__desc">Decide verdadero/falso o opción A/B al azar.</p>
-                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                    <p class="tool-card__desc">¿Cara o cruz? Dejémoslo a la suerte.</p>
+                    <span class="tool-card__tag tag-random">Azar</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="4-esquinas">
                     <div class="tool-card__icon" aria-hidden="true">🏠</div>
                     <h4 class="tool-card__title">4 Esquinas</h4>
-                    <p class="tool-card__desc">Asigna una opción a cada esquina del salón y selecciona una.</p>
-                    <span class="tool-card__tag tag-random">Aleatorio</span>
+                    <p class="tool-card__desc">Cada rincón es una opción. ¿A cuál vas?</p>
+                    <span class="tool-card__tag tag-random">Azar</span>
                 </a>
 
-                <!-- Evaluación -->
+                <!-- PUNTOS Y VOTOS -->
                 <a href="#tool-panel" class="tool-card" data-tool="votacion">
                     <div class="tool-card__icon" aria-hidden="true">👍</div>
                     <h4 class="tool-card__title">Votación</h4>
-                    <p class="tool-card__desc">Sistema de votación rápida con resultados en tiempo real.</p>
-                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                    <p class="tool-card__desc">Levanta la mano virtualmente. ¡Vota tú también!</p>
+                    <span class="tool-card__tag tag-eval">Votos</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="preguntas-equipo">
                     <div class="tool-card__icon" aria-hidden="true">❓</div>
                     <h4 class="tool-card__title">Preguntas por Equipo</h4>
-                    <p class="tool-card__desc">Turnos de preguntas asignados por equipos.</p>
-                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                    <p class="tool-card__desc">¿Quién responde? Turnos para cada equipo.</p>
+                    <span class="tool-card__tag tag-eval">Votos</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="tabla-puntos">
                     <div class="tool-card__icon" aria-hidden="true">🏆</div>
                     <h4 class="tool-card__title">Tabla de Puntos</h4>
-                    <p class="tool-card__desc">Marcador interactivo para llevar el puntaje de equipos.</p>
-                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                    <p class="tool-card__desc">¡A ver quién gana! Marcador para los equipos.</p>
+                    <span class="tool-card__tag tag-eval">Votos</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="radar-asistencia">
                     <div class="tool-card__icon" aria-hidden="true">📋</div>
-                    <h4 class="tool-card__title">Radar Asistencia</h4>
-                    <p class="tool-card__desc">Lista rápida para pasar lista o rastrear participación.</p>
-                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                    <h4 class="tool-card__title">Pasar Lista</h4>
+                    <p class="tool-card__desc">¡Presente! Lista rápida de la clase.</p>
+                    <span class="tool-card__tag tag-eval">Votos</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="votacion-rapida-ab">
                     <div class="tool-card__icon" aria-hidden="true">🅰️</div>
                     <h4 class="tool-card__title">Votación A/B</h4>
-                    <p class="tool-card__desc">Pregunta de opción múltiple simple (Verdadero/Falso).</p>
-                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                    <p class="tool-card__desc">¿Verdadero o falso? Elige tu lado.</p>
+                    <span class="tool-card__tag tag-eval">Votos</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="semaforo-comportamiento">
                     <div class="tool-card__icon" aria-hidden="true">🚦</div>
                     <h4 class="tool-card__title">Semáforo Comport.</h4>
-                    <p class="tool-card__desc">Indicador visual grupal de nivel de ruido/atención.</p>
-                    <span class="tool-card__tag tag-eval">Evaluación</span>
+                    <p class="tool-card__desc">🟢🟡🔴 ¿Cómo vamos de comportamiento y ruido?</p>
+                    <span class="tool-card__tag tag-eval">Votos</span>
                 </a>
 
-                <!-- Juegos y Herramientas -->
+                <!-- JUEGOS -->
                 <a href="#tool-panel" class="tool-card" data-tool="sopa-letras">
                     <div class="tool-card__icon" aria-hidden="true">🔍</div>
                     <h4 class="tool-card__title">Sopa de Letras</h4>
-                    <p class="tool-card__desc">Busca conceptos clave ocultos en la cuadrícula.</p>
+                    <p class="tool-card__desc">Encuentra las palabras escondidas en la cuadrícula.</p>
                     <span class="tool-card__tag tag-game">Juego</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="ahorcado">
                     <div class="tool-card__icon" aria-hidden="true">🪢</div>
                     <h4 class="tool-card__title">Ahorcado</h4>
-                    <p class="tool-card__desc">Adivina el concepto letra por letra antes de que se acabe.</p>
+                    <p class="tool-card__desc">Adivina la palabra secreta letra por letra.</p>
                     <span class="tool-card__tag tag-game">Juego</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="clasificacion-rapida">
                     <div class="tool-card__icon" aria-hidden="true">📦</div>
                     <h4 class="tool-card__title">Clasificación Rápida</h4>
-                    <p class="tool-card__desc">Arrastra conceptos a las categorías correctas.</p>
+                    <p class="tool-card__desc">Ordena las ideas y ponlas en su lugar.</p>
                     <span class="tool-card__tag tag-game">Juego</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="nube-palabras">
                     <div class="tool-card__icon" aria-hidden="true">💬</div>
                     <h4 class="tool-card__title">Nube de Palabras</h4>
-                    <p class="tool-card__desc">Genera una nube visual con los términos de la clase.</p>
+                    <p class="tool-card__desc">¿Qué decimos más? Las palabras más dichas vuelan aquí.</p>
                     <span class="tool-card__tag tag-game">Herram.</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="pregunta-sorpresa">
                     <div class="tool-card__icon" aria-hidden="true">❔</div>
                     <h4 class="tool-card__title">Pregunta Sorpresa</h4>
-                    <p class="tool-card__desc">Extrae una pregunta aleatoria de tu banco de preguntas.</p>
+                    <p class="tool-card__desc">¡Ring! Pregunta inesperada. ¿Estás listo?</p>
                     <span class="tool-card__tag tag-game">Herram.</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="simon-dice">
                     <div class="tool-card__icon" aria-hidden="true">👀</div>
                     <h4 class="tool-card__title">Simón Dice</h4>
-                    <p class="tool-card__desc">Genera instrucciones cinestésicas aleatorias para el grupo.</p>
+                    <p class="tool-card__desc">¡Haz lo que Simón mande! Atención y movimiento.</p>
                     <span class="tool-card__tag tag-game">Juego</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="conecta-conceptos">
                     <div class="tool-card__icon" aria-hidden="true">🔗</div>
                     <h4 class="tool-card__title">Conecta Conceptos</h4>
-                    <p class="tool-card__desc">Une pares de conceptos relacionados (memoria).</p>
+                    <p class="tool-card__desc">Une las parejas que van de la mano.</p>
                     <span class="tool-card__tag tag-game">Juego</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="nivel-ruido">
                     <div class="tool-card__icon" aria-hidden="true">📢</div>
                     <h4 class="tool-card__title">Medidor de Ruido</h4>
-                    <p class="tool-card__desc">Usa el micrófono para mostrar un medidor visual del aula.</p>
+                    <p class="tool-card__desc">Shhh... ¿Hacemos mucho ruido? Mira el medidor.</p>
                     <span class="tool-card__tag tag-game">Herram.</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="pizarra-colaborativa">
                     <div class="tool-card__icon" aria-hidden="true">🖌️</div>
                     <h4 class="tool-card__title">Pizarra Colaborativa</h4>
-                    <p class="tool-card__desc">Espacio de dibujo rápido para lluvia de ideas.</p>
+                    <p class="tool-card__desc">¡A dibujar y pintar ideas en la pantalla!</p>
                     <span class="tool-card__tag tag-game">Herram.</span>
                 </a>
 
                 <a href="#tool-panel" class="tool-card" data-tool="ruleta-preguntas">
                     <div class="tool-card__icon" aria-hidden="true">🔄</div>
                     <h4 class="tool-card__title">Ruleta Preguntas</h4>
-                    <p class="tool-card__desc">Como la ruleta normal, pero divide por categorías temáticas.</p>
+                    <p class="tool-card__desc">Gira y responde. Preguntas por temas.</p>
                     <span class="tool-card__tag tag-game">Herram.</span>
                 </a>
 
@@ -372,8 +344,8 @@
 
         <!-- Zona de Prueba FX -->
         <section id="fx-test-section" class="dashboard-section fx-test">
-            <h3 class="section-title">🧪 Zona de Prueba — Efectos Visuales</h3>
-            <p class="fx-test__note">Botones temporales para verificar las animaciones del canvas.</p>
+            <h3 class="section-title">🧪 Laboratorio de Efectos</h3>
+            <p class="fx-test__note">Botones de prueba para las animaciones de la pantalla.</p>
             <div class="fx-test__buttons">
                 <button id="btn-test-fireworks" class="btn-retro btn-green" type="button">
                     <span class="btn-retro__icon" aria-hidden="true">🎆</span> Fuegos Artificiales
@@ -386,7 +358,8 @@
 
     </main>
 
-    <script type="module" src="main.js"></script>
+    <!-- Sin type="module" para evitar errores de CORS en GitHub Pages -->
+    <script src="main.js"></script>
 </body>
 
 </html>
