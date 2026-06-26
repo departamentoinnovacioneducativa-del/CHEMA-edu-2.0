@@ -1,8 +1,7 @@
 // ============================================================
-// EDU CHEMA 2.0 — LÓGICA PRINCIPAL
+// EDU CHEMA 2.0 — LÓGICA PRINCIPAL CON SONIDO RETRO SINTETIZADO
 // ============================================================
 
-// Esperamos a que el DOM cargue completamente
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. SELECCIÓN DE ELEMENTOS DEL DOM ---
@@ -14,10 +13,78 @@ document.addEventListener('DOMContentLoaded', () => {
     const fxCanvas = document.getElementById('fx-canvas');
     const ctx = fxCanvas.getContext('2d');
 
+    // --- 2. MOTOR DE SONIDO RETRO (Web Audio API) ---
+    let audioCtx;
+    let isSoundOn = true;
 
-    // --- 2. LÓGICA DE NAVEGACIÓN (DROPDOWNS) ---
+    // Inicializar el contexto de audio (Debe hacerse por interacción del usuario)
+    const initAudio = () => {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.state === 'suspended' && audioCtx.resume();
+        }
+    };
 
-    // Función para cerrar todos los menús abiertos
+    // Función genérica para tocar notas retro
+    const playNote = (frequency, duration, type = 'square', volume = 0.1) => {
+        if (!isSoundOn || !audioCtx) return;
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = type; // 'square', 'sine', 'sawto', 'triangle' (square es muy 8-bit)
+        osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + duration);
+    };
+
+    // Efectos de sonido específicos
+    const sfx = {
+        click: () => playNote(800, 0.05, 'square', 0.08), // Pitido corto
+        open: () => { // Barrido ascendente
+            playNote(300, 0.1); 
+            setTimeout(() => playNote(500, 0.1), 50);
+        },
+        close: () => { // Barrido descendente
+            playNote(500, 0.1); 
+            setTimeout(() => playNote(300, 0.1), 50);
+        },
+        success: () => { // Fanfarria de 3 notas
+            playNote(523, 0.1); 
+            setTimeout(() => playNote(659, 0.1), 100);
+            setTimeout(() => playNote(784, 0.15), 200);
+        },
+        explosion: () => { // Ruido blanco rápido / Bajo grave
+            playNote(80, 0.3, 'sawtooth', 0.2);
+            playNote(60, 0.4, 'square', 0.15);
+        },
+        fireworks: () => { // Chispeo agudo
+            playNote(1200, 0.05, 'sine', 0.05);
+            setTimeout(() => playNote(1500, 0.05, 'sine', 0.05), 50);
+            setTimeout(() => playNote(1800, 0.05, 'sine', 0.05), 100);
+        }
+    };
+
+    // Botón de Sound Toggle
+    btnSoundToggle.addEventListener('click', () => {
+        initAudio(); // Nos aseguramos de inicializar el audio aquí
+        isSoundOn = !isSoundOn;
+        btnSoundToggle.textContent = isSoundOn ? '🔊' : '🔇';
+        btnSoundToggle.setAttribute('aria-label', isSoundOn ? 'Sonido activado' : 'Sonido desactivado');
+        if (isSoundOn) sfx.click(); // Sonido para confirmar que se activó
+    });
+
+
+    // --- 3. LÓGICA DE NAVEGACIÓN (DROPDOWNS) ---
     const closeAllDropdowns = () => {
         document.querySelectorAll('.nav-dropdown.is-open').forEach(dd => {
             dd.classList.remove('is-open');
@@ -25,70 +92,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Delegación de eventos en el menú principal (más eficiente que poner eventos a cada botón)
     mainNav.addEventListener('click', (e) => {
         const trigger = e.target.closest('.nav-dropdown__trigger');
         const item = e.target.closest('.nav-dropdown__item');
 
-        // Si se hace clic en el botón principal del dropdown
         if (trigger) {
+            initAudio(); // Iniciar audio en la primera interacción
             const dropdown = trigger.closest('.nav-dropdown');
             const isOpen = dropdown.classList.contains('is-open');
             
-            closeAllDropdowns(); // Cierra los demás primero
+            closeAllDropdowns();
             
-            // Si no estaba abierto, lo abrimos
             if (!isOpen) {
                 dropdown.classList.add('is-open');
                 trigger.setAttribute('aria-expanded', 'true');
+                sfx.open();
+            } else {
+                sfx.close();
             }
-            return; // Salimos para no ejecutar el código de abajo
+            return;
         }
 
-        // Si se hace clic en una opción del menú desplegable
         if (item) {
+            initAudio();
             closeAllDropdowns();
             const toolId = item.dataset.tool;
-            if (toolId) loadTool(toolId);
+            if (toolId) {
+                sfx.click();
+                loadTool(toolId);
+            }
         }
     });
 
-    // Cerrar menús si hacemos clic fuera de la navegación
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('#main-nav')) {
-            closeAllDropdowns();
-        }
+        if (!e.target.closest('#main-nav')) closeAllDropdowns();
     });
-
-    // Cerrar menús con la tecla Escape (Accesibilidad)
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeAllDropdowns();
     });
 
 
-    // --- 3. SISTEMA DE CARGA DE HERRAMIENTAS ---
-
-    // Escuchar clics en las tarjetas de acceso rápido (<a> tags)
+    // --- 4. SISTEMA DE CARGA DE HERRAMIENTAS ---
     document.querySelectorAll('.tool-card[data-tool]').forEach(card => {
         card.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevenir el salto del href="#"
+            e.preventDefault();
+            initAudio(); // Iniciar audio en la primera interacción
+            sfx.click();
             loadTool(card.dataset.tool);
         });
-        // Soporte para teclado (Enter/Space)
         card.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                initAudio();
+                sfx.click();
                 loadTool(card.dataset.tool);
             }
         });
     });
 
-    // Función principal para renderizar una herramienta
     const loadTool = (toolId) => {
-        // Formatear el nombre: 'cronometro' -> 'Cronometro', 'papa-caliente' -> 'Papa Caliente'
         const toolName = toolId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
         
-        // Renderizar el panel con la herramienta seleccionada
         toolPanel.innerHTML = `
             <div class="tool-loaded">
                 <div class="tool-loaded__header">
@@ -102,17 +166,18 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Añadir evento al botón de cerrar que acabamos de inyectar
-        toolPanel.querySelector('.btn-close-tool').addEventListener('click', closeTool);
+        toolPanel.querySelector('.btn-close-tool').addEventListener('click', () => {
+            sfx.close();
+            closeTool();
+        });
 
-        // Efecto visual de bienvenida (Explosión de pixels)
+        // Efectos al cargar
         createExplosion(window.innerWidth / 2, window.innerHeight / 3);
+        sfx.success(); // ¡Fanfarria de carga!
         
-        // Desplazarse suavemente hasta el panel de la herramienta
         toolPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    // Función para cerrar la herramienta y mostrar estado vacío
     const closeTool = () => {
         toolPanel.innerHTML = `
             <div class="tool-panel__empty-state">
@@ -123,20 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // --- 4. SISTEMA DE SONIDO (Placeholder) ---
-
-    let isSoundOn = true;
-    btnSoundToggle.addEventListener('click', () => {
-        isSoundOn = !isSoundOn;
-        btnSoundToggle.textContent = isSoundOn ? '🔊' : '🔇';
-        btnSoundToggle.setAttribute('aria-label', isSoundOn ? 'Sonido activado' : 'Sonido desactivado');
-        // Aquí iría la lógica real de Audio API
-    });
-
-
     // --- 5. CANVAS DE EFECTOS VISUALES (FX) ---
-
-    // Ajustar tamaño del canvas al tamaño de la ventana
     const resizeCanvas = () => {
         fxCanvas.width = window.innerWidth;
         fxCanvas.height = window.innerHeight;
@@ -144,98 +196,64 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Array para almacenar las partículas
     let particles = [];
 
-    // Clase Partícula (Estilo Pixel/Retro)
     class Particle {
         constructor(x, y, color, speedX, speedY, size, life) {
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            this.speedX = speedX;
-            this.speedY = speedY;
-            this.size = size;
-            this.life = life;
-            this.maxLife = life;
+            this.x = x; this.y = y; this.color = color;
+            this.speedX = speedX; this.speedY = speedY;
+            this.size = size; this.life = life; this.maxLife = life;
         }
-
         update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            this.speedY += 0.1; // Simulación de gravedad
-            this.life--;
+            this.x += this.speedX; this.y += this.speedY;
+            this.speedY += 0.1; this.life--;
         }
-
         draw() {
             const alpha = this.life / this.maxLife;
-            ctx.globalAlpha = alpha;
-            ctx.fillStyle = this.color;
-            // Dibujar cuadrados (pixel art style, sin bordes redondeados)
+            ctx.globalAlpha = alpha; ctx.fillStyle = this.color;
             ctx.fillRect(this.x, this.y, this.size, this.size);
         }
     }
 
-    // Generador de Fuegos Artificiales
     const createFireworks = (x, y) => {
         const colors = ['#ffc800', '#ff4757', '#00aa44', '#00cc55', '#ffffff', '#ffe066'];
         for (let i = 0; i < 60; i++) {
             const angle = Math.random() * Math.PI * 2;
             const speed = Math.random() * 6 + 2;
-            particles.push(new Particle(
-                x, y,
-                colors[Math.floor(Math.random() * colors.length)],
-                Math.cos(angle) * speed,
-                Math.sin(angle) * speed,
-                Math.random() * 4 + 2, // Tamaño en píxeles
-                Math.random() * 40 + 20 // Vida útil
-            ));
+            particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], Math.cos(angle) * speed, Math.sin(angle) * speed, Math.random() * 4 + 2, Math.random() * 40 + 20));
         }
     };
 
-    // Generador de Explosión Pixelada
     const createExplosion = (x, y) => {
         const colors = ['#ff4757', '#ff6b81', '#ffc800'];
         for (let i = 0; i < 40; i++) {
-            particles.push(new Particle(
-                x, y,
-                colors[Math.floor(Math.random() * colors.length)],
-                (Math.random() - 0.5) * 12,
-                (Math.random() - 0.5) * 12,
-                Math.random() * 8 + 4, // Tamaño más grande para la explosión
-                Math.random() * 20 + 10 // Vida más corta
-            ));
+            particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], (Math.random() - 0.5) * 12, (Math.random() - 0.5) * 12, Math.random() * 8 + 4, Math.random() * 20 + 10));
         }
     };
 
-    // Bucle de Animación del Canvas
     const animateFx = () => {
         ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-        
-        // Iterar de atrás hacia adelante para poder eliminar partículas muertas sin romper el índice
         for (let i = particles.length - 1; i >= 0; i--) {
-            particles[i].update();
-            particles[i].draw();
-            
-            if (particles[i].life <= 0) {
-                particles.splice(i, 1);
-            }
+            particles[i].update(); particles[i].draw();
+            if (particles[i].life <= 0) particles.splice(i, 1);
         }
-        
-        ctx.globalAlpha = 1; // Resetear alpha para el siguiente frame
+        ctx.globalAlpha = 1;
         requestAnimationFrame(animateFx);
     };
 
-    // Iniciar el bucle de animación
     animateFx();
 
-    // Eventos de los botones de prueba FX
+    // Botones de prueba FX (Con sonido añadido)
     btnTestFireworks.addEventListener('click', () => {
+        initAudio();
         createFireworks(window.innerWidth / 2, window.innerHeight / 2);
+        sfx.fireworks();
     });
 
     btnTestExplosion.addEventListener('click', () => {
+        initAudio();
         createExplosion(window.innerWidth / 2, window.innerHeight / 2);
+        sfx.explosion();
     });
 
-}); // Fin del DOMContentLoaded
+});
