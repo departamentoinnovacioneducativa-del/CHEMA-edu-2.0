@@ -916,6 +916,7 @@ body {
 /* ----------------------------------------------------------
    DADOS VIRTUALES (Estilos Específicos)
    ---------------------------------------------------------- */
+*/
 .dados-container {
     gap: var(--space-xl);
 }
@@ -974,4 +975,5 @@ body {
 /* Animación de rodar */
 .die-rolling {
     animation: shake 0.1s infinite;
+}
 }
