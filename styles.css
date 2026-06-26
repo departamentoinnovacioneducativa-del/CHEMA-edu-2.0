@@ -854,3 +854,62 @@ body {
     .ruleta-layout { width: 50%; }
     .ruleta-controls { width: 50%; max-width: none; margin: 0; }
 }
+/* ----------------------------------------------------------
+   PAPA CALIENTE (Estilos Específicos)
+   ---------------------------------------------------------- */
+.papa-container {
+    gap: var(--space-lg);
+}
+
+.poma-visual {
+    font-size: 6rem;
+    transition: transform 0.1s;
+}
+
+.papa-timer {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-4xl);
+    color: var(--color-text);
+    background-color: var(--color-bg-dark);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--space-md) var(--space-lg);
+    box-shadow: var(--shadow-sunken);
+    text-shadow: 0 0 10px var(--color-green);
+    min-width: 200px;
+    text-align: center;
+    transition: color 0.2s, text-shadow 0.2s, border-color 0.2s;
+}
+
+.papa-status {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-md);
+    color: var(--color-yellow);
+    text-align: center;
+    min-height: 20px;
+}
+
+/* Colores de tensión */
+.papa-safe { color: var(--color-green-light); border-color: var(--color-green); text-shadow: 0 0 10px var(--color-green); }
+.papa-warning { color: var(--color-yellow); border-color: var(--color-yellow); text-shadow: 0 0 15px var(--color-yellow); }
+.papa-danger { color: #ff4757; border-color: #ff4757; text-shadow: 0 0 15px #ff4757; }
+
+/* Estado: Explotado */
+.papa-exploded {
+    color: #ff4757;
+    font-size: 5rem;
+    animation: pulse-winner 0.2s ease infinite alternate;
+}
+
+/* Animación de temblar */
+.papa-shake {
+    animation: shake 0.1s infinite;
+}
+
+@keyframes shake {
+    0% { transform: translate(-2px, 1px) rotate(-1deg); }
+    25% { transform: translate(2px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(0deg); }
+    75% { transform: translate(1px, -2px) rotate(1deg); }
+    100% { transform: translate(-2px, 1px) rotate(-1deg); }
+}
