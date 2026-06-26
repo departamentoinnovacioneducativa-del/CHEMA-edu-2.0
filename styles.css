@@ -730,3 +730,127 @@ body {
     background-color: var(--color-green-light);
     box-shadow: 0 0 20px var(--color-green-light);
 }
+/* ----------------------------------------------------------
+   RULETA (Estilos Específicos)
+   ---------------------------------------------------------- */
+.ruleta-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.ruleta-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.ruleta-canvas-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* El triángulo que apunta a la opción ganadora */
+.ruleta-pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    color: var(--color-yellow);
+    z-index: 10;
+    filter: drop-shadow(0 2px 0 var(--color-yellow-dark));
+}
+
+.ruleta-canvas {
+    background-color: var(--color-bg-dark);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 50%;
+    box-shadow: var(--shadow-sunken);
+    image-rendering: pixelated; // Le da un toque más retro al dibujo
+}
+
+.ruleta-winner {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-xl);
+    color: var(--color-yellow);
+    text-shadow: 2px 2px 0px var(--color-yellow-dark);
+    min-height: 40px;
+    text-align: center;
+}
+
+.winner-active {
+    animation: pulse-winner 0.5s ease infinite alternate;
+}
+
+@keyframes pulse-winner {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); color: var(--color-green-light); text-shadow: 2px 2px 0px var(--color-green-dark); }
+}
+
+.ruleta-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.ruleta-input-group {
+    display: flex;
+    gap: var(--space-sm);
+    width: 100%;
+}
+
+.ruleta-input-group .expo-input {
+    flex-grow: 1;
+    width: auto;
+}
+
+.ruleta-list-wrapper {
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: var(--color-bg-dark);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--space-xs);
+}
+
+.ruleta-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.ruleta-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-bg-light);
+    padding: var(--space-xs) var(--space-sm);
+    font-family: var(--font-retro);
+    font-size: var(--fs-lg);
+    color: var(--color-text);
+    border-radius: 2px;
+}
+
+.btn-spin {
+    font-size: var(--fs-md) !important;
+    padding: var(--space-md) var(--space-xl) !important;
+}
+
+/* Responsivo: En pantallas grandes, poner ruleta y controles lado a lado */
+@media (min-width: 768px) {
+    .ruleta-container {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    .ruleta-layout { width: 50%; }
+    .ruleta-controls { width: 50%; max-width: none; margin: 0; }
+}
