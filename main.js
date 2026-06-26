@@ -94,3 +94,63 @@
             </div>
         `;
     };
+    // --- LÓGICA ESPECÍFICA: CRONÓMETRO ---
+    const initCronometro = () => {
+        const display = document.getElementById('crono-display');
+        const btnStart = document.getElementById('crono-start');
+        const btnPause = document.getElementById('crono-pause');
+        const btnReset = document.getElementById('crono-reset');
+
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+
+        const formatTime = (time) => {
+            let minutes = Math.floor(time / 60000);
+            let seconds = Math.floor((time % 60000) / 1000);
+            let milliseconds = Math.floor((time % 1000) / 10); // Solo 2 dígitos
+
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(2, '0')}`;
+        };
+
+        const startTimer = () => {
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(() => {
+                elapsedTime = Date.now() - startTime;
+                display.textContent = formatTime(elapsedTime);
+            }, 10); // Actualiza cada 10ms para efecto fluido
+            
+            btnStart.disabled = true;
+            btnPause.disabled = false;
+            sfx.click();
+        };
+
+        const pauseTimer = () => {
+            clearInterval(timerInterval);
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            sfx.click();
+        };
+
+        const resetTimer = () => {
+            clearInterval(timerInterval);
+            elapsedTime = 0;
+            display.textContent = '00:00.00';
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            sfx.click();
+        };
+
+        // Asignar eventos
+        btnStart.addEventListener('click', startTimer);
+        btnPause.addEventListener('click', pauseTimer);
+        btnReset.addEventListener('click', resetTimer);
+
+        // Función de limpieza para cuando se cierre la herramienta
+        currentToolCleanup = () => {
+            clearInterval(timerInterval);
+            btnStart.removeEventListener('click', startTimer);
+            btnPause.removeEventListener('click', pauseTimer);
+            btnReset.removeEventListener('click', resetTimer);
+        };
+    };
