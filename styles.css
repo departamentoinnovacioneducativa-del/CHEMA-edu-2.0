@@ -519,3 +519,60 @@ body {
     0%, 100% { transform: translateY(0); } 
     50% { transform: translateY(-6px); } 
 }
+/* ----------------------------------------------------------
+   CRONÓMETRO (Estilos Específicos)
+   ---------------------------------------------------------- */
+.crono-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-lg) 0;
+}
+
+.crono-display {
+    font-family: var(--font-pixel);
+    font-size: clamp(2.5rem, 8vw, 5rem); /* Tamaño gigante y responsivo */
+    color: var(--color-green-light);
+    background-color: var(--color-bg-dark);
+    border: var(--border-width) solid var(--color-green);
+    border-radius: var(--border-radius);
+    padding: var(--space-md) var(--space-lg);
+    box-shadow: var(--shadow-sunken); /* Efecto de pantalla hundida */
+    text-shadow: 0 0 10px var(--color-green); /* Brillo neón */
+    min-width: 300px;
+    text-align: center;
+}
+
+.crono-controls {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Botón de peligro/reiniciar (Rojo) */
+.btn-danger {
+    background-color: #cc2222;
+    color: var(--color-text);
+    border-color: #ff4444;
+    box-shadow: 4px 4px 0px #881111;
+}
+.btn-danger:hover:not(:disabled) { 
+    transform: translate(-2px, -2px); 
+    box-shadow: 6px 6px 0px #881111; 
+}
+.btn-danger:active { 
+    transform: translate(3px, 3px); 
+    box-shadow: 0 0 0 transparent; 
+}
+
+/* Estilo para botones deshabilitados */
+.btn-retro:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    background-color: var(--color-text-muted);
+    border-color: var(--color-border);
+}
