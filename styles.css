@@ -599,3 +599,75 @@ body {
     border-color: #00cc55 !important;
     text-shadow: 0 0 10px #00cc55 !important;
 }
+/* ----------------------------------------------------------
+   TEMPORIZADOR EXPOSICIÓN (Estilos Específicos)
+   ---------------------------------------------------------- */
+.expo-config {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-lg);
+}
+
+.expo-label {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+}
+
+.btn-small {
+    font-size: var(--fs-sm) !important;
+    padding: var(--space-xs) var(--space-sm) !important;
+}
+
+.expo-input {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-md);
+    width: 60px;
+    padding: var(--space-xs);
+    text-align: center;
+    background-color: var(--color-bg-dark);
+    color: var(--color-green-light);
+    border: 2px solid var(--color-green);
+    border-radius: var(--border-radius);
+}
+
+/* Pantalla Gigante */
+.expo-display {
+    font-family: var(--font-pixel);
+    font-size: clamp(3rem, 12vw, 8rem); /* GIGANTE y responsivo */
+    color: var(--color-green-light);
+    background-color: var(--color-bg-dark);
+    border: var(--border-width) solid var(--color-green);
+    border-radius: var(--border-radius);
+    padding: var(--space-md) var(--space-lg);
+    box-shadow: var(--shadow-sunken);
+    text-shadow: 0 0 15px var(--color-green);
+    min-width: 300px;
+    text-align: center;
+    margin-bottom: var(--space-lg);
+    transition: color 0.2s, text-shadow 0.2s, border-color 0.2s;
+}
+
+/* Estado: Menos de 1 minuto (Amarillo parpadeando) */
+.expo-warning {
+    color: var(--color-yellow);
+    border-color: var(--color-yellow);
+    text-shadow: 0 0 15px var(--color-yellow);
+    animation: blink 1s step-end infinite;
+}
+
+/* Estado: ¡Tiempo! (Rojo parpadeando rápido) */
+.expo-danger {
+    color: #ff4757;
+    border-color: #ff4757;
+    text-shadow: 0 0 15px #ff4757;
+    animation: blink 0.5s step-end infinite;
+    font-size: clamp(2rem, 8vw, 5rem); /* Un poco más pequeño para que quepa el texto */
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
